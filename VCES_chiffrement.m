@@ -22,13 +22,13 @@ texte_clair = fread(fid);
 fclose(fid);
 texte_clair_bin = dec2bin(texte_clair,8);
 
-bit_stuff = ceil(size(texte_clair_bin,1)/8)*8;
+bit_stuff = ceil(size(texte_clair_bin,1)/16)*16;
 if bit_stuff > size(texte_clair_bin,1)
 	nb_char = bit_stuff - size(texte_clair_bin,1);
 	texte_clair_bin(end+1:bit_stuff,:) = texte_clair_bin(end-nb_char+1:end,:);
 end,
-
-texte_clair_bin = uint8(reshape(texte_clair_bin',64,[])')-48;
+disp(texte_clair_bin);
+texte_clair_bin = uint8(reshape(texte_clair_bin',32,[])')-48;
 disp(texte_clair_bin);
 return,
 

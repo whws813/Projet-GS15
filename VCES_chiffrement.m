@@ -2,10 +2,10 @@ function VCES_chiffrement
 %fonction permettant le chiffrement d'un fichier avec VCES (AES + DES)
 
 % Lecture du texte (voir fonction ci-dessous) et conversion pour pouvoir utilisable sous Matlab
-%texte_clair_bin = lecture_texte_entre;
+texte_clair_bin = lecture_texte_entre;
 
 % Lecture de la cl?(voir fonction ci-dessous) et g??ation des 16 les sous-cl? 
-cles = lecture_cle_entre;
+%cles = lecture_cle_entre;
 return,
 
 %%%%% Fonction de lecture du texte %%%%%%%%%%%%%%%
@@ -27,30 +27,39 @@ if bit_stuff > size(texte_clair_bin,1)
 	nb_char = bit_stuff - size(texte_clair_bin,1);
 	texte_clair_bin(end+1:bit_stuff,:) = texte_clair_bin(end-nb_char+1:end,:);
 end,
-
+disp(texte_clair_bin);
 texte_clair_bin = uint8(reshape(texte_clair_bin',32,[])')-48;
+disp(texte_clair_bin);
 return,
 
 %%%%% Fonction de lecture du texte %%%%%%%%%%%%%%%
 function [ keys_bin ] = lecture_cle_entre
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-cle_ok = 0;
-while cle_ok == 0
-    cle_entre = input('Entrez votre cle de chiffrement\n4 ou 8 ou 16 lettres ou numbres\n', 's');
-    if (size(cle_entre,2) == 4) || (size(cle_entre,2) == 8) || (size(cle_entre,2) == 16)
-        cle_ok = 1;
-    end
+cle_entre = input('Entrez votre cle de chiffrement\n Soit un char de 64 ou 56 (\"01\"), soit un numerique (utilise comme graine) \n', 's');
+if strcmp(cle_entre, '"')
+	if size(cle_entre,2) == 58 || size(cle_entre,2) == 66
+		K0_texte = cle_entre(2:end-1);
+		K0 = double(K0_texte)-48;
+	else
+		error('La cle doit faire 56 ou 64 bits');
+	end
+else
+	cle_entre = str2num(cle_entre);
+	rand('twister', cle_entre);
+	K0 = rand(1,64)>0.5;
 end,
 
-cle_bin = dec2bin(cle_entre,8);
-%cle_bin = reshape(cle_bin',[],1)';
-if size(cle_bin,1) == 4
-    cle_bin(5:8,:) = cle_bin(1:4,:);
-    cle_bin(9:16,:) = cle_bin(1:8,:);
-elseif size(cle_bin,1) == 8
-    cle_bin(9:16,:) = cle_bin(1:8,:);
-end
+if size(K0,2) == 64
+	for i=1:8
+		K0(i*8) = 1-mod(sum(K0((i-1)*8+1:i*8-1)),2);
+	end,
+else
+	for i=1:8
+		K0(i*8+1:end+1) = K0(i*8:end);
+		K0(i*8) = 1-mod(sum(K0((i-1)*8+1:i*8-1)),2);
+	end,
+end,
 
 % Generation des cles K1, ... , K16
 PC1g = [ 57 , 49 , 41 , 33 , 25 , 17 , 9 , 1 , 58 , 50 , 42 , 34 , 26 , 18 , 10 , 2 , 59 , 51 , 43 , 35 , 27 , 19 , 11 , 3 , 60 , 52 , 44 , 36 ];

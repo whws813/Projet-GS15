@@ -9,7 +9,8 @@ function test
 % state(4,1:24) = 0;
 % state(4,25:32) = 1;
 
-state(1:4,1:32) = 0;
+state(1:2,1:32) = 0;
+state(3:4,1:32) = 1;
 
 state = uint8(state);
 

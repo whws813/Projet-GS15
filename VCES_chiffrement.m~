@@ -48,9 +48,38 @@ cle_bin = dec2bin(cle_entre,8);
 if size(cle_bin,1) == 4
     cle_bin(5:8,:) = cle_bin(1:4,:);
     cle_bin(9:16,:) = cle_bin(1:8,:);
-elseif size(cle_bin,1) == 8
-    cle_bin(9:16,:) = cle_bin(1:8,:);
-end
+elseif size(cle_bin,1) ==
+bit_stuff = ceil(size(cle_bin,1)/16)*16;
+if bit_stuff > size(cle_bin,1)
+	nb_char = bit_stuff - size(cle_bin,1);
+	cle_bin(end+1:bit_stuff,:) = cle_bin(end-nb_char+1:end,:);
+end,
+disp(cle_entre);
+% if strcmp(cle_entre, '"')
+%     disp('string!!!!!');
+% 	if size(cle_entre,2) == 58 || size(cle_entre,2) == 66
+% 		K0_texte = cle_entre(2:end-1);
+% 		K0 = double(K0_texte)-48;
+% 	else
+% 		error('La cle doit faire 56 ou 64 bits');
+% 	end
+% else
+%     disp('num!!!');
+% 	cle_entre = str2num(cle_entre);
+% 	rand('twister', cle_entre);
+% 	K0 = rand(1,64)>0.5;
+% end,
+% 
+% if size(K0,2) == 64
+% 	for i=1:8
+% 		K0(i*8) = 1-mod(sum(K0((i-1)*8+1:i*8-1)),2);
+% 	end,
+% else
+% 	for i=1:8
+% 		K0(i*8+1:end+1) = K0(i*8:end);
+% 		K0(i*8) = 1-mod(sum(K0((i-1)*8+1:i*8-1)),2);
+% 	end,
+%end,
 
 % Generation des cles K1, ... , K16
 PC1g = [ 57 , 49 , 41 , 33 , 25 , 17 , 9 , 1 , 58 , 50 , 42 , 34 , 26 , 18 , 10 , 2 , 59 , 51 , 43 , 35 , 27 , 19 , 11 , 3 , 60 , 52 , 44 , 36 ];

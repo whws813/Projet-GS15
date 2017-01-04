@@ -150,16 +150,16 @@ if (round == 10)
     %state = AddRoundKey(state,key[round]);
     state = InvShiftRows(state);
     state = InvSubBytes(state);
-    state = AddRoundKey(state,key);
-    state = InvMixColumns(state);
     %state = AddRoundKey(state,key[round]);
 elseif((round>1)&&(round<10))
-    state = InvShiftRows(state);
-    state = InvSubBytes(state);
     state = AddRoundKey(state,key);
     state = InvMixColumns(state);
+    state = InvShiftRows(state);
+    state = InvSubBytes(state);
     %state = AddRoundKey(state,key[round]); 
 else
+    state = AddRoundKey(state,key);
+    state = InvMixColumns(state);
     state = InvShiftRows(state);
     state = InvSubBytes(state);
     state = AddRoundKey(state,key);

@@ -159,7 +159,7 @@ if (round == 1)
     state = SubBytes(state);
     state = ShiftRows(state);
     state = MixColumns(state);
-    key = KeyExpansion(key);
+    %key = KeyExpansion(key);
     state = AddRoundKey(state,key);
 elseif((round>1)&&(round<10))
     state = SubBytes(state);

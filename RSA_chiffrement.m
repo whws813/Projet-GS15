@@ -47,11 +47,7 @@ end
 if choix == 1
     prompt = ['Veuillez saisir la taille de cle (bits)\n'];
     nb_bits = input(prompt);
-    [n,e,d] = generation_cleRSA(nb_bits);
-    ecriture_cle(n,e,'./publicKey.txt');
-    ecriture_cle(n,d,'./privateKey.txt');
-    disp('La cle privee est enregistre dans privateKey.txt\n');
-    disp('La cle public est enregistre dans publicKey.txt\n');
+    [n,e] = generation_cleRSA(nb_bits);
 else
     string = input('Entrez le nom de fichier contenant la cle public\n', 's');
     if exist(string)~=2
@@ -74,16 +70,3 @@ else
     e = GMPint(num2str(e));
 end
 return,
-
-%%%% Fonction d'ecriture d'une cle privee ou d'une cle public%%
-function ecriture_cle(GMPint1,GMPint2,nom)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-A = uint8(char(GMPint1)) + 48;
-B = uint8(char(GMPint2)) + 48;
-texte = [A,uint8(' '),B];
-fid = fopen(nom,'w');
-fwrite(fid,texte);
-fclose(fid);
-return

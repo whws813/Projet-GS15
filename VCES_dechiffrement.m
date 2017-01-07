@@ -28,18 +28,19 @@ for line = 1:4:size(texte_clair_bin)
 end
 texte_dechiffre_bin = reshape(texte_dechiffre_bin',8,[])';
 texte_dechiffre = char(bin2dec(num2str(uint8(texte_dechiffre_bin))))';
-fid = fopen('./dechiffrer.txt', 'w');
+fid = fopen('./VCESdechiff.txt', 'w');
 fwrite(fid,texte_dechiffre);
 fclose(fid);
 disp('Message d¨¦chiffre: ');
 disp(texte_dechiffre);
+disp('\nEnregistrer dans VCESdechiff.txt');
 return,
 
 %%%%% Fonction de lecture du texte %%%%%%%%%%%%%%%
 function [ texte_clair_bin ] = lecture_texte_entre
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-string = input('Entrez le nom de votre fichier\n', 's');
+string = input('Entrez le nom de fichier a dechiffrer\n', 's');
 if exist(string)~=2
 	error('Le fichier demande est introuvable');
 end
@@ -74,7 +75,7 @@ return,
 
 %%%%% Fonction de generation des sous-cles DES
 function [sous_cle] = SousCleDES(cle_bin)
-K0 = uint8(reshape(cle_bin',1,[]))-48;
+K0 = uint8(reshape(cle_bin',[],1)')-48;
 PC1g = [ 57 , 49 , 41 , 33 , 25 , 17 , 9 , 1 , 58 , 50 , 42 , 34 , 26 , 18 , 10 , 2 , 59 , 51 , 43 , 35 , 27 , 19 , 11 , 3 , 60 , 52 , 44 , 36 ];
 PC1d = [ 63 , 55 , 47 , 39 , 31 , 23 , 15 , 7 , 62 , 54 , 46 , 38 , 30 , 22 , 14 , 6 , 61 , 53 , 45 , 37 , 29 , 21 , 13 , 5 , 28 , 20 , 12 , 4 ];
 L0 = K0(1,PC1g);
@@ -84,9 +85,9 @@ PC2 = [ 14 , 17 , 11 , 24 , 1 , 5 , 3 , 28 , 15 , 6 , 21 , 10 , 23 , 19 , 12 , 4
 sous_cle = zeros(10,48);
 
 for i=1:10
-	vi = 2;
     if i==1 || i==2 || i==9
         vi=1; 
+    else vi = 2;
     end
 	%Permutation circulaire
 	tmp = L0(1:vi);
@@ -104,10 +105,72 @@ for i=1:10
 end,
 return,
 
+%%%%% Fonction de KeyExpansion du AES %%%%%%%%%%%%%%%
 function [sous_cle] = SousCleAES(cle)
  cle = uint8(reshape(cle',32,[])')-48;
-sous_cle = cle;
+ for i=1:4
+     cle_temp(i,:) = cle(i,:);
+ end
+ for i=5:4*(10+1)
+     if mod(i-1,4) == 0
+        cle_temp(i,:) = xor(cle_temp(i-4,:),ShiftCle(cle_temp(i-1,:),i)); 
+     else cle_temp(i,:) = xor(cle_temp(i-4,:),cle_temp(i-1,:));
+     end
+ end
+sous_cle = cle_temp;
 return,
+
+%%%%% Fonction Subcle dans KeyExpansion du AES %%%%%%%%%%%%%%%
+function [cle_temp] = ShiftCle(cle_temp,round)
+SboxSubBytes = ['63' '7c' '77' '7b' 'f2' '6b' '6f' 'c5' '30' '01' '67' '2b' 'fe' 'd7' 'ab' '76';
+    'ca' '82' 'c9' '7d' 'fa' '59' '47' 'f0' 'ad' 'd4' 'a2' 'af' '9c' 'a4' '72' 'c0';
+    'b7' 'fd' '93' '26' '36' '3f' 'f7' 'cc' '34' 'a5' 'e5' 'f1' '71' 'd8' '31' '15';
+    '04' 'c7' '23' 'c3' '18' '96' '05' '9a' '07' '12' '80' 'e2' 'eb' '27' 'b2' '75';
+    '09' '83' '2c' '1a' '1b' '6e' '5a' 'a0' '52' '3b' 'd6' 'b3' '29' 'e3' '2f' '84';
+    '53' 'd1' '00' 'ed' '20' 'fc' 'b1' '5b' '6a' 'cb' 'be' '39' '4a' '4c' '58' 'cf';
+    'd0' 'ef' 'aa' 'fb' '43' '4d' '33' '85' '45' 'f9' '02' '7f' '50' '3c' '9f' 'a8';
+    '51' 'a3' '40' '8f' '92' '9d' '38' 'f5' 'bc' 'b6' 'da' '21' '10' 'ff' 'f3' 'd2';
+    'cd' '0c' '13' 'ec' '5f' '97' '44' '17' 'c4' 'a7' '7e' '3d' '64' '5d' '19' '73';
+    '60' '81' '4f' 'dc' '22' '2a' '90' '88' '46' 'ee' 'b8' '14' 'de' '5e' '0b' 'db';
+    'e0' '32' '3a' '0a' '49' '06' '24' '5c' 'c2' 'd3' 'ac' '62' '91' '95' 'e4' '79';
+    'e7' 'c8' '37' '6d' '8d' 'd5' '4e' 'a9' '6c' '56' 'f4' 'ea' '65' '7a' 'ae' '08';
+    'ba' '78' '25' '2e' '1c' 'a6' 'b4' 'c6' 'e8' 'dd' '74' '1f' '4b' 'bd' '8b' '8a';
+    '70' '3e' 'b5' '66' '48' '03' 'f6' '0e' '61' '35' '57' 'b9' '86' 'c1' '1d' '9e';
+    'e1' 'f8' '98' '11' '69' 'd9' '8e' '94' '9b' '1e' '87' 'e9' 'ce' '55' '28' 'df';
+    '8c' 'a1' '89' '0d' 'bf' 'e6' '42' '68' '41' '99' '2d' '0f' 'b0' '54' 'bb' '16'];
+
+RC = ['00', '01', '02', '04', '08', '10', '20', '40', '80', '1B', '36'];
+%declager a gauche par un octet
+    for j = 1:32
+        row = mod(j+7,32) + 1;
+        cle_temp(1,j) = cle_temp(1,row);
+    end
+%faire subbytes pour chaque octet    
+    for j = 1:8:32
+        row = 0;
+        column = 0;
+        for m = j : (j+3)
+            row = cle_temp(1,m)*(2^(3-m+j)) + row;
+        end
+        for m = (j+4):(j+7)
+            column = cle_temp(1,m)*(2^(7-m+j)) + column;
+        end
+        row = row + 1;
+        column = column + 1;
+        A = SboxSubBytes(row,column*2-1:column*2);
+        C(1,j:j+7) = dec2bin(hex2dec(A),8);
+    end
+    cle_temp = uint8(C)-48;
+%xor avec RC de 32bits
+    RC_array = [RC(2*((round-1)/4)+1:2*((round-1)/4)+2),'00','00','00']; 
+    for k=1:2:8
+        RC_temp((k+1)/2,:)=dec2bin(hex2dec(RC_array(k:k+1)),8);
+    end
+    RC_temp = uint8(reshape(RC_temp',32,[])')-48;
+    cle_temp = xor(cle_temp,RC_temp);
+return,
+
+
 
 %%%%% Fonction de la ronde de Feistel du DES %%%%%%%%%%%%%%%
 function [ cipher_bloc ] = Feistel_DES(Droite, cle)
@@ -143,27 +206,21 @@ return,
 
 %%%%% Fonction permettant de realiser une iteration de AES
 function [cipher_bloc] = AES_dechiffrement(state,key,round)
-
 if (round == 10)
-    key = KeyExpansion(key);
-    state = AddRoundKey(state,key);
-    %state = AddRoundKey(state,key[round]);
+    state = AddRoundKey(state,key(4*round+1:4*round+4,:));
     state = InvShiftRows(state);
     state = InvSubBytes(state);
-    %state = AddRoundKey(state,key[round]);
 elseif((round>1)&&(round<10))
-    state = AddRoundKey(state,key);
+    state = AddRoundKey(state,key(4*round+1:4*round+4,:));
     state = InvMixColumns(state);
     state = InvShiftRows(state);
     state = InvSubBytes(state);
-    %state = AddRoundKey(state,key[round]); 
 else
-    state = AddRoundKey(state,key);
+    state = AddRoundKey(state,key(4*round+1:4*round+4,:));
     state = InvMixColumns(state);
     state = InvShiftRows(state);
     state = InvSubBytes(state);
-    state = AddRoundKey(state,key);
-    %state = AddRoundKey(state,key[round]);
+    state = AddRoundKey(state,key(1:4,:));
 end
 
 cipher_bloc = state;
@@ -171,7 +228,6 @@ return,
 
 function [cipher_bloc] = AddRoundKey(state,key)
 cipher_bloc = xor(state,key);
-cipher_bloc = uint8(cipher_bloc);
 return,
 
 function [cipher_bloc] = InvSubBytes(state)
@@ -232,12 +288,9 @@ function [cipher_bloc] = InvMixColumns(state)
      state(3,i:i+7) = xor(xor(xor(multi13(word1),multi9(word2)),multi14(word3)),multi11(word4));
      state(4,i:i+7) = xor(xor(xor(multi11(word1),multi13(word2)),multi9(word3)),multi14(word4));
  end
- cipher_bloc = uint8(state);
+ cipher_bloc = state;
 return,
 
-function [round_key] = KeyExpansion(key)
-round_key = key;
-return,
 
 function [new_word] = multi11(word)
 table11 = ['00','0b','16','1d','2c','27','3a','31','58','53','4e','45','74','7f','62','69','b0','bb','a6','ad','9c','97','8a','81','e8','e3','fe','f5','c4','cf','d2','d9','7b','70','6d','66','57','5c','41','4a','23','28','35','3e','0f','04','19','12','cb','c0','dd','d6','e7','ec','f1','fa','93','98','85','8e','bf','b4','a9','a2','f6','fd','e0','eb','da','d1','cc','c7','ae','a5','b8','b3','82','89','94','9f','46','4d','50','5b','6a','61','7c','77','1e','15','08','03','32','39','24','2f','8d','86','9b','90','a1','aa','b7','bc','d5','de','c3','c8','f9','f2','ef','e4','3d','36','2b','20','11','1a','07','0c','65','6e','73','78','49','42','5f','54','f7','fc','e1','ea','db','d0','cd','c6','af','a4','b9','b2','83','88','95','9e','47','4c','51','5a','6b','60','7d','76','1f','14','09','02','33','38','25','2e','8c','87','9a','91','a0','ab','b6','bd','d4','df','c2','c9','f8','f3','ee','e5','3c','37','2a','21','10','1b','06','0d','64','6f','72','79','48','43','5e','55','01','0a','17','1c','2d','26','3b','30','59','52','4f','44','75','7e','63','68','b1','ba','a7','ac','9d','96','8b','80','e9','e2','ff','f4','c5','ce','d3','d8','7a','71','6c','67','56','5d','40','4b','22','29','34','3f','0e','05','18','13','ca','c1','dc','d7','e6','ed','f0','fb','92','99','84','8f','be','b5','a8','a3'];

@@ -58,16 +58,3 @@ end
     n = GMPint(num2str(n));
     d = GMPint(num2str(d));
 return,
-
-%%%% Fonction d'ecriture d'une cle privee ou d'une cle public%%
-function ecriture_cle(GMPint1,GMPint2,nom)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-A = uint8(char(GMPint1)) + 48;
-B = uint8(char(GMPint2)) + 48;
-texte = [A,uint8(' '),B];
-fid = fopen(nom,'w');
-fwrite(fid,texte);
-fclose(fid);
-return

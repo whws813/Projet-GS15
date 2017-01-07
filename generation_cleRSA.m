@@ -1,4 +1,4 @@
-function [n,e,d] = generation_cleRSA(nb_bits)
+function [n,e] = generation_cleRSA(nb_bits)
 % Function permettant de generer un cle privee et un cle public
 % [n,e] est la cle privee, b est la cle public
 % d est l'inverse de e dans Z/phi(n)
@@ -18,9 +18,9 @@ while(test_primality(q) == 0)
 end
 
 %generation de e
-e = GMPrand(nb_bits/4);
+e = GMPrand(4);
 while((pgcdGMP(e,p-1) ~= 1) || (pgcdGMP(e,q-1) ~= 1))
-    e = GMPrand_impair(nb_bits/4);
+    e = GMPrand(4);
 end
 
 n = p*q;
@@ -28,4 +28,20 @@ phi_n = (p-1)*(q-1);
 
 %calcul de d
 d = GMPinverse(e,phi_n);
+
+ecriture_cle(n,e,'publicKey.txt','cle public');
+ecriture_cle(n,d,'privateKey.txt','cle privee');
+return
+
+%%%% Fonction d'ecriture d'une cle public %%
+function ecriture_cle(GMPint1,GMPint2,nom,type)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+a = uint8(char(GMPint1)) + 48;
+b = uint8(char(GMPint2)) + 48;
+texte = [a,uint8(' '),b];
+fid = fopen(nom,'w');
+fwrite(fid,texte);
+fclose(fid);
+fprintf('La %s est enregistre dans %s\n',type,nom);
 return

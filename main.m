@@ -5,7 +5,7 @@ function main
 algo = 0;
 
 %choix possibles
-choix = [1,2,3,4,5];
+choix = [1,2,3,4,5,6];
 
 while ismember(algo,choix) == 0
     prompt = ['Selectionner votre fonction de chiffrement\n'...
@@ -26,4 +26,8 @@ elseif algo == 3
     RSA_chiffrement;
 elseif algo == 4
     RSA_dechiffrement;
+elseif algo == 5
+    Signature;
+elseif algo == 6
+    checkSignature;
 end

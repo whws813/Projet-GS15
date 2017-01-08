@@ -10,6 +10,7 @@ for i = 1:size(texte_clair,1)
     texte_dechiffre(1,i) = char(bin2dec(num2str(char(C))));
 end
 
+%Enregistrer la message dechiffre
 fid = fopen('./RSAdechiff.txt','w');
 fwrite(fid,texte_dechiffre);
 fclose(fid);
@@ -36,7 +37,7 @@ for i=1:8:size(texte_chiffre,1)
 end
 return,
 
-%%%%% Fonction de lecture du texte %%%%%%%%%%%%%%%
+%%%%% Fonction de lecture de la cle %%%%%%%%%%%%%%%
 function [ n,d ] = lecture_cle
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 string = input('Entrez le nom de fichier contenant la cle privee\n', 's');

@@ -1,4 +1,4 @@
-function [n,e] = generation_cleRSA(nb_bits)
+function [n,e,d] = generation_cleRSA(nb_bits)
 % Function permettant de generer un cle privee et un cle public
 % [n,e] est la cle privee, b est la cle public
 % d est l'inverse de e dans Z/phi(n)

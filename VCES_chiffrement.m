@@ -34,7 +34,7 @@ fwrite(fid,texte_chiffre);
 fclose(fid);
 disp('Message chiffre: ');
 disp(texte_chiffre);
-disp('\nEnregistre dans VCESchiff.txt');
+disp('Enregistre dans VCESchiff.txt');
 return,
 
 %%%%% Fonction de lecture du texte %%%%%%%%%%%%%%%

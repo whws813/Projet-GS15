@@ -10,6 +10,7 @@ for i = 1:size(texte_clair,1)
     texte_chiffre(1,8*i-7:8*i) = dec2hex(bin2dec(num2str(char(C))),8);
 end
 
+%Enregistrer la message chiffre
 fid = fopen('./RSAchiff.txt','w');
 fwrite(fid,texte_chiffre);
 fclose(fid);
@@ -30,10 +31,9 @@ end
 fid = fopen(string);
 texte_clair = fread(fid);
 fclose(fid);
-%texte_clair_bin = dec2bin(texte_clair,8);
 return,
 
-%%%%% Fonction de lecture du texte %%%%%%%%%%%%%%%
+%%%%% Fonction de lecture de la cle %%%%%%%%%%%%%%%
 function [ n,e ] = lecture_cle
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 choix = 0;
@@ -47,7 +47,7 @@ end
 if choix == 1
     prompt = ['Veuillez saisir la taille de cle (bits)\n'];
     nb_bits = input(prompt);
-    [n,e] = generation_cleRSA(nb_bits);
+    [n,e,~] = generation_cleRSA(nb_bits);
 else
     string = input('Entrez le nom de fichier contenant la cle public\n', 's');
     if exist(string)~=2

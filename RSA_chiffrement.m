@@ -36,37 +36,23 @@ return,
 %%%%% Fonction de lecture de la cle %%%%%%%%%%%%%%%
 function [ n,e ] = lecture_cle
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-choix = 0;
-while (choix ~= 1) && (choix ~= 2)
-    prompt = ['Veuillez choisir\n'...
-    '->1<- Generer une cle privee et une cle public\n'...
-    '->2<- Importer une cle public\n'];
-    choix = input(prompt);
+string = input('Entrez le nom de fichier contenant la cle public\n', 's');
+if exist(string)~=2
+    error('Le fichier demande est introuvable');
 end
-
-if choix == 1
-    prompt = ['Veuillez saisir la taille de cle (bits)\n'];
-    nb_bits = input(prompt);
-    [n,e,~] = generation_cleRSA(nb_bits);
-else
-    string = input('Entrez le nom de fichier contenant la cle public\n', 's');
-    if exist(string)~=2
-        error('Le fichier demande est introuvable');
+fid = fopen(string);
+cle = fread(fid);
+fclose(fid);
+%cle = char(reshape(cle,1,[]));
+for i = 1:size(cle,1)
+    if cle(i,1) == 32
+        n = cle (1:i-1,1);
+        e = cle (i+1:end,1);
+        break
     end
-    fid = fopen(string);
-    cle = fread(fid);
-    fclose(fid);
-    %cle = char(reshape(cle,1,[]));
-    for i = 1:size(cle,1)
-        if cle(i,1) == 32
-            n = cle (1:i-1,1);
-            e = cle (i+1:end,1);
-            break
-        end
-    end
-    n = bin2dec(num2str(n'-48));
-    e = bin2dec(num2str(e'-48));
-    n = GMPint(num2str(n));
-    e = GMPint(num2str(e));
 end
+n = bin2dec(num2str(n'-48));
+e = bin2dec(num2str(e'-48));
+n = GMPint(num2str(n));
+e = GMPint(num2str(e));
 return,
